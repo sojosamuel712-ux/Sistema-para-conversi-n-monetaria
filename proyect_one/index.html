@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dormiust: conversor multi-moneda y gestor de presupuesto diario. Unifica gastos y ahorros en USD y bolívares con tasa BCV en tiempo real.">
+    <title>Dormiust — Gestor de Presupuesto Multi-Moneda</title>
+    <link rel="icon" href="./img/logo/logo.jpg" type="image/jpeg">
+    <link rel="preload" href="style/style.css" as="style">
+    <link rel="stylesheet" href="style/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.7/dist/chart.umd.min.js" defer></script>
+</head>
+<body>
+    <header class="header" aria-label="Encabezado principal">
+        <div class="header-inner">
+            <img class="header-logo-img" src="./img/logo/logo.jpg" alt="Logo Dormiust" width="48" height="48" decoding="async">
+            <div class="header-text">
+                <span class="header-brand">Dormiust</span>
+                <span class="header-tagline">Finanzas personales simplificadas</span>
+            </div>
+            <button type="button" id="btn-ver-registros" class="btn-header" aria-haspopup="dialog">
+                Ver mis registros
+            </button>
+        </div>
+    </header>
+
+    <main class="main">
+        <section class="panel panel-intro" aria-labelledby="intro-title">
+            <div class="intro-content">
+                <img class="intro-logo" src="./img/logo/logo.jpg" alt="" width="96" height="96" decoding="async">
+                <h1 id="intro-title" class="intro-title">Conversor Multi-Moneda y Gestor de Presupuesto</h1>
+                <p class="intro-lead">
+                    Controla tus <strong>gastos</strong> y <strong>ahorros</strong> aunque pagues en dólares o bolívares.
+                    La tasa del BCV se obtiene automáticamente del Banco Central de Venezuela.
+                </p>
+
+                <ul class="intro-features">
+                    <li>
+                        <span class="feature-icon" aria-hidden="true">$</span>
+                        <div>
+                            <strong>Varias monedas</strong>
+                            <p>Registra cada movimiento en USD o VES. Si es dólar, se convierte a bolívares con la tasa BCV.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="feature-icon" aria-hidden="true">↻</span>
+                        <div>
+                            <strong>Tasa BCV automática</strong>
+                            <p>Consultamos la tasa oficial publicada por el Banco Central de Venezuela.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="feature-icon" aria-hidden="true">◎</span>
+                        <div>
+                            <strong>Gastos y ahorros</strong>
+                            <p>Clasifica cada registro y visualiza ambos apartados en listas y gráficas.</p>
+                        </div>
+                    </li>
+                    <li>
+                        <span class="feature-icon" aria-hidden="true">↓</span>
+                        <div>
+                            <strong>Historial guardado</strong>
+                            <p>Consulta tus registros anteriores con resumen visual por categoría.</p>
+                        </div>
+                    </li>
+                </ul>
+            </div>
+        </section>
+
+        <section class="panel panel-budget" aria-labelledby="budget-title">
+            <form id="budget-form" class="budget-form" novalidate>
+                <header class="budget-header">
+                    <h2 id="budget-title">Tu presupuesto de hoy</h2>
+                    <p>Registra gastos y ahorros con conversión BCV</p>
+                </header>
+
+                <div class="bcv-info" aria-live="polite">
+                    <div class="bcv-tasa">
+                        <span class="bcv-label">Tasa BCV (Bs. por 1 USD)</span>
+                        <strong id="tasa-bcv-display">Cargando…</strong>
+                    </div>
+                    <p id="bcv-meta" class="bcv-meta">Fuente: Banco Central de Venezuela</p>
+                    <input type="hidden" id="tasa-cambio" name="tasa_cambio" value="">
+                </div>
+
+                <div class="budget-config">
+                    <div class="campo-grupo campo-full">
+                        <label for="presupuesto-limite">Presupuesto diario (USD)</label>
+                        <input type="number" id="presupuesto-limite" name="presupuesto_limite" min="0" step="0.01" placeholder="Opcional" inputmode="decimal">
+                    </div>
+                </div>
+
+                <fieldset class="budget-agregar">
+                    <legend class="sr-only">Nuevo movimiento</legend>
+                    <div class="campo-grupo">
+                        <label for="gasto-descripcion">Descripción</label>
+                        <input type="text" id="gasto-descripcion" placeholder="Almuerzo, ahorro mensual…" maxlength="120">
+                    </div>
+                    <div class="fila-monto">
+                        <div class="campo-grupo">
+                            <label for="gasto-monto">Monto</label>
+                            <input type="number" id="gasto-monto" min="0.01" step="0.01" placeholder="0.00" inputmode="decimal">
+                        </div>
+                        <div class="campo-grupo">
+                            <label for="gasto-moneda">Moneda</label>
+                            <select id="gasto-moneda" name="moneda">
+                                <option value="USD">USD ($)</option>
+                                <option value="VES">VES (Bs.)</option>
+                            </select>
+                        </div>
+                    </div>
+                    <p id="preview-conversion" class="preview-conversion" aria-live="polite"></p>
+                    <div class="fila-botones-tipo">
+                        <button type="button" id="btn-agregar-gasto" class="btn-tipo btn-tipo-gasto">+ Gasto</button>
+                        <button type="button" id="btn-agregar-ahorro" class="btn-tipo btn-tipo-ahorro">+ Ahorro</button>
+                    </div>
+                </fieldset>
+
+                <div class="secciones-movimientos">
+                    <div class="seccion-movimiento seccion-gastos">
+                        <h3 class="seccion-titulo">
+                            <span class="badge-tipo badge-gasto">Gastos</span>
+                            <span id="subtotal-gastos" class="seccion-subtotal">$ 0.00</span>
+                        </h3>
+                        <ul id="lista-gastos" class="lista-gastos" aria-live="polite"></ul>
+                    </div>
+                    <div class="seccion-movimiento seccion-ahorros">
+                        <h3 class="seccion-titulo">
+                            <span class="badge-tipo badge-ahorro">Ahorros</span>
+                            <span id="subtotal-ahorros" class="seccion-subtotal">$ 0.00</span>
+                        </h3>
+                        <ul id="lista-ahorros" class="lista-gastos" aria-live="polite"></ul>
+                    </div>
+                </div>
+
+                <div class="budget-totales" aria-live="polite">
+                    <div class="total-item">
+                        <span>Gastos (USD)</span>
+                        <strong id="total-gastos-usd">$ 0.00</strong>
+                    </div>
+                    <div class="total-item">
+                        <span>Ahorros (USD)</span>
+                        <strong id="total-ahorros-usd">$ 0.00</strong>
+                    </div>
+                    <div class="total-item">
+                        <span>Gastos (Bs.)</span>
+                        <strong id="total-gastos-ves">—</strong>
+                    </div>
+                    <div class="total-item">
+                        <span>Ahorros (Bs.)</span>
+                        <strong id="total-ahorros-ves">—</strong>
+                    </div>
+                    <div class="total-item total-unificado">
+                        <span>Balance neto</span>
+                        <strong id="total-neto">$ 0.00</strong>
+                    </div>
+                    <div class="total-item">
+                        <span>Presupuesto restante</span>
+                        <strong id="presupuesto-restante">—</strong>
+                    </div>
+                </div>
+
+                <p id="mensaje-estado" class="mensaje-estado" role="status"></p>
+                <button type="submit" id="btn-guardar" class="btn-primario">Guardar registro del día</button>
+            </form>
+        </section>
+    </main>
+
+    <div id="modal-registros" class="modal" hidden role="dialog" aria-modal="true" aria-labelledby="modal-registros-titulo">
+        <div class="modal-backdrop" data-cerrar-modal></div>
+        <div class="modal-contenido">
+            <header class="modal-header" aria-label="Encabezado del historial de registros">
+                <h2 id="modal-registros-titulo">Mis registros</h2>
+                <button type="button" class="btn-cerrar-modal" data-cerrar-modal aria-label="Cerrar">&times;</button>
+            </header>
+
+            <div class="modal-grafica">
+                <canvas id="grafica-registros" aria-describedby="grafica-descripcion"></canvas>
+                <span id="grafica-descripcion" class="visually-hidden">Gráfica de gastos y ahorros</span>
+            </div>
+
+            <div class="modal-resumen" aria-live="polite">
+                <div class="resumen-item resumen-gasto">
+                    <span>Total gastos</span>
+                    <strong id="historial-total-gastos">$ 0.00</strong>
+                </div>
+                <div class="resumen-item resumen-ahorro">
+                    <span>Total ahorros</span>
+                    <strong id="historial-total-ahorros">$ 0.00</strong>
+                </div>
+            </div>
+
+            <div id="lista-registros" class="lista-registros"></div>
+
+            <footer class="historial-neto" aria-live="polite" aria-label="Neto total de registros">
+                <span class="historial-neto-label">Neto total (lo que queda)</span>
+                <strong id="historial-neto-total">$ 0.00</strong>
+            </footer>
+        </div>
+    </div>
+
+    <footer class="footer" aria-label="Pie de página de Dormiust">
+        <p>&copy; 2026 Dormiust — Herramienta de gestión financiera personal</p>
+    </footer>
+
+    <script src="js/budget.js" defer></script>
+</body>
+</html>

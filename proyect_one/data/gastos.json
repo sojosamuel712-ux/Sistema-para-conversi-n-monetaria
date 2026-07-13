@@ -1,0 +1,33 @@
+[
+    {
+        "id": "reg_6a4d767e107461.34202922",
+        "fecha": "2026-07-07",
+        "tasa_bcv": 674.9305,
+        "presupuesto_limite": 0,
+        "movimientos": [
+            {
+                "descripcion": "ahorro",
+                "monto": 100,
+                "moneda": "USD",
+                "monto_usd": 100,
+                "monto_ves": 67493.05,
+                "tipo": "ahorro"
+            },
+            {
+                "descripcion": "equipo nuevo",
+                "monto": 50,
+                "moneda": "USD",
+                "monto_usd": 50,
+                "monto_ves": 33746.53,
+                "tipo": "gasto"
+            }
+        ],
+        "totales": {
+            "gastos_usd": 50,
+            "gastos_ves": 33746.53,
+            "ahorros_usd": 100,
+            "ahorros_ves": 67493.05
+        },
+        "guardado_en": "2026-07-07T21:58:22+00:00"
+    }
+]
