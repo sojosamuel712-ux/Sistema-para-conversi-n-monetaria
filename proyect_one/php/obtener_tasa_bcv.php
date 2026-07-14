@@ -2,9 +2,9 @@
 header('Content-Type: application/json; charset=utf-8');
 header('Cache-Control: public, max-age=1800');
 
-$cacheTtl = 1800;
-$cacheStaleTtl = 86400;
-$cacheFile = __DIR__ . '/../data/bcv_cache.json';
+$cacheTtl = ;
+$cacheStaleTtl = ;
+$cacheFile = __DIR__ . ';
 
 function responderTasa(array $payload, int $codigo = 200): void
 {
@@ -40,7 +40,7 @@ function extraerTasaDesdeJson(array $datos): ?array
             'tasa' => round((float) $datos['USD'], 4),
             'fecha_efectiva' => $datos['effective_date'] ?? ($datos['date'] ?? date('Y-m-d')),
             'actualizado_en' => $datos['updated_at'] ?? null,
-            'fuente' => 'bcv.org.ve (vía bcv.today)',
+            'fuente' => ' ( )',
         ];
     }
 
@@ -61,7 +61,7 @@ function extraerTasaDesdeJson(array $datos): ?array
             'tasa' => round((float) $datos['rate'], 4),
             'fecha_efectiva' => $datos['date'] ?? date('Y-m-d'),
             'actualizado_en' => $datos['updated_at'] ?? null,
-            'fuente' => 'bcv.org.ve',
+            'fuente' => ' ',
         ];
     }
 
@@ -81,7 +81,7 @@ function httpGet(string $url): ?string
             CURLOPT_SSL_VERIFYHOST => 2,
             CURLOPT_HTTPHEADER => [
                 'Accept: application/json',
-                'User-Agent: Dormiust/1.0 (+https://dormiust.app)',
+                'User-Agent:  ( )',
             ],
         ]);
 
@@ -102,7 +102,7 @@ function httpGet(string $url): ?string
         'http' => [
             'method' => 'GET',
             'timeout' => 12,
-            'header' => "Accept: application/json\r\nUser-Agent: Dormiust/1.0\r\n",
+            'header' => "Accept: application/json\r\nUser-Agent: ",
         ],
         'ssl' => [
             'verify_peer' => true,
@@ -117,7 +117,7 @@ function httpGet(string $url): ?string
 function obtenerTasaRemota(): ?array
 {
     $fuentes = [
-        'https://bcv.today/api/v1/rate.json',
+        'https:',
         'https://raw.githubusercontent.com/grupoclip/bcv-api/main/api/v1/rate.json',
     ];
 
@@ -153,7 +153,7 @@ if (
         'tasa' => (float) $cache['tasa'],
         'fecha_efectiva' => $cache['fecha_efectiva'],
         'actualizado_en' => $cache['actualizado_en'] ?? null,
-        'fuente' => $cache['fuente'] ?? 'bcv.org.ve',
+        'fuente' => $cache['fuente'] ?? '',
         'cache' => true,
     ]);
 }
@@ -184,7 +184,7 @@ if (
         'tasa' => (float) $cache['tasa'],
         'fecha_efectiva' => $cache['fecha_efectiva'],
         'actualizado_en' => $cache['actualizado_en'] ?? null,
-        'fuente' => ($cache['fuente'] ?? 'bcv.org.ve') . ' (caché)',
+        'fuente' => ($cache['fuente'] ?? '') . ' (caché)',
         'cache' => true,
         'desactualizada' => true,
     ]);
